@@ -45,7 +45,7 @@ export default function OwnerDashboard() {
 
   const fetchOwnerMenu = async (ownerId: number) => {
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/owner-menu/${ownerId}`);
+      const res = await fetch(`https://tara-tourism-system.onrender.com/api/owner-menu/${ownerId}`);
       const data = await res.json();
       setMenuItems(data);
     } catch (err) { console.error(err); } finally { setLoading(false); }
@@ -53,7 +53,7 @@ export default function OwnerDashboard() {
 
   const handleSaveProfile = async () => {
   try {
-    const res = await fetch(`http://127.0.0.1:8000/api/users/${user?.id}/profile`, {
+    const res = await fetch(`https://tara-tourism-system.onrender.com/api/users/${user?.id}/profile`, {
       method: 'PUT',
       headers: { 
         'Content-Type': 'application/json',
@@ -80,8 +80,8 @@ export default function OwnerDashboard() {
       available: formData.available ? 1 : 0 
     };
     const url = modalMode === 'add' 
-      ? 'http://127.0.0.1:8000/api/menu-items' 
-      : `http://127.0.0.1:8000/api/menu-items/${formData.id}`;
+      ? 'https://tara-tourism-system.onrender.com/api/menu-items' 
+      : `https://tara-tourism-system.onrender.com/api/menu-items/${formData.id}`;
     
     await fetch(url, { 
       method: modalMode === 'add' ? 'POST' : 'PUT', 
@@ -94,7 +94,7 @@ export default function OwnerDashboard() {
 
   const deleteMenuItem = async (id: number) => {
     if (confirm('Are you sure you want to remove this item?')) {
-      await fetch(`http://127.0.0.1:8000/api/menu-items/${id}`, {
+      await fetch(`https://tara-tourism-system.onrender.com/api/menu-items/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('tara_token')}` }
       });

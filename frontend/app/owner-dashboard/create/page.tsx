@@ -27,7 +27,7 @@ export default function CreateHotelPage() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/places', {
+      const response = await fetch('https://tara-tourism-system.onrender.com/api/places', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

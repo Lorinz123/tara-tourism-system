@@ -39,7 +39,7 @@ export default function CreatePlacePage() {
     try {
 
       const response = await fetch(
-        'http://127.0.0.1:8000/api/places',
+        'https://tara-tourism-system.onrender.com/api/places',
         {
           method: 'POST',
           headers: {

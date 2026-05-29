@@ -51,7 +51,7 @@ export default function EditPlacePage() {
     try {
 
       const res = await fetch(
-        `http://127.0.0.1:8000/api/places/${id}`
+        `https://tara-tourism-system.onrender.com/api/places/${id}`
       );
 
       const data = await res.json();
@@ -122,7 +122,7 @@ export default function EditPlacePage() {
     try {
 
       const response = await fetch(
-        `http://127.0.0.1:8000/api/places/${id}`,
+        `https://tara-tourism-system.onrender.com/api/places/${id}`,
         {
 
           method: 'PUT',

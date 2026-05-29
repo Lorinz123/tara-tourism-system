@@ -92,7 +92,7 @@ export default function ExplorePage() {
       |--------------------------------------------------------------------------
       */
       const menuRes = await fetch(
-        'http://127.0.0.1:8000/api/menu-items'
+        'https://tara-tourism-system.onrender.com/api/menu-items'
       );
 
       const menuData =
@@ -144,7 +144,7 @@ export default function ExplorePage() {
       |--------------------------------------------------------------------------
       */
       const placesRes = await fetch(
-        'http://127.0.0.1:8000/api/all-places'
+        'https://tara-tourism-system.onrender.com/api/all-places'
       );
 
       const placesData =

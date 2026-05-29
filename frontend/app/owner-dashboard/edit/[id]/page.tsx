@@ -17,7 +17,7 @@ export default function EditHotel() {
   });
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:8000/api/my-hotels/${id}`, {
+    fetch(`https://tara-tourism-system.onrender.com/api/my-hotels/${id}`, {
       headers: { 
         'Authorization': `Bearer ${localStorage.getItem('tara_token')}`,
         'Accept': 'application/json'
@@ -39,7 +39,7 @@ export default function EditHotel() {
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-    await fetch(`http://127.0.0.1:8000/api/my-hotels/${id}`, {
+    await fetch(`https://tara-tourism-system.onrender.com/api/my-hotels/${id}`, {
       method: 'PUT',
       headers: { 
         'Content-Type': 'application/json',

@@ -11,7 +11,7 @@ export default function OwnerDashboard() {
 
   useEffect(() => {
     // ... keep your existing auth check logic here ...
-    fetch(`http://127.0.0.1:8000/api/my-hotels`, {
+    fetch(`https://tara-tourism-system.onrender.com/api/my-hotels`, {
       headers: { 
         'Authorization': `Bearer ${localStorage.getItem('tara_token')}`,
         'Accept': 'application/json'
