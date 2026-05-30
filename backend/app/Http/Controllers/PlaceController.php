@@ -102,25 +102,26 @@ class PlaceController extends Controller
     | STORE
     |--------------------------------------------------------------------------
     */
-    public function store(Request $request)
-    {
-        try {
-            $validated = $request->validate([
-                'name' => 'required|string|max:255',
-                'description' => 'required|string',
-                'category' => 'required|string|max:255',
-                'image_url' => 'required|string',
-                'address' => 'required|string|max:255',
-                'booking_url' => 'nullable|url', 
-                'owner_id' => 'required|integer',
-            ]);
+public function store(Request $request)
+{
+    try {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'category' => 'required|string|max:255',
+            'image_url' => 'required|string',
+            'address' => 'required|string|max:255',
+        ]);
 
-            $place = Place::create($validated);
-            return response()->json(['message' => 'Place created successfully', 'place' => $place], 201);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to create place', 'error' => $e->getMessage()], 500);
-        }
+        // Dynamically assign the ID of the authenticated user
+        $validated['owner_id'] = Auth::id();
+
+        $place = Place::create($validated);
+        return response()->json(['message' => 'Place created successfully', 'place' => $place], 201);
+    } catch (\Exception $e) {
+        return response()->json(['message' => 'Failed to create place', 'error' => $e->getMessage()], 500);
     }
+}
 
     /*
     |--------------------------------------------------------------------------

@@ -57,10 +57,7 @@ Route::get(
 );
 
 // CREATE place
-Route::post(
-    '/places',
-    [PlaceController::class, 'store']
-);
+Route::middleware('auth:sanctum')->post('/places', [PlaceController::class, 'store']);
 
 // UPDATE place
 Route::put(
