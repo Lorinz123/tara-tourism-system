@@ -3,6 +3,9 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+// Dynamic API URL entrypoint setup
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://tara-tourism-system.onrender.com';
+
 export default function CreateHotelPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -27,7 +30,8 @@ export default function CreateHotelPage() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
 
     try {
-      const response = await fetch('https://tara-tourism-system.onrender.com/api/places', {
+      // FIXED: Removed the hardcoded string to use the central API_URL configuration
+      const response = await fetch(`${API_URL}/api/places`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

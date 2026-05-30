@@ -3,6 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 
+// Dynamic API URL entrypoint setup
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://tara-tourism-system.onrender.com';
+
 export default function EditHotel() {
   const { id } = useParams();
   const router = useRouter();
@@ -17,7 +20,8 @@ export default function EditHotel() {
   });
 
   useEffect(() => {
-    fetch(`https://tara-tourism-system.onrender.com/api/my-hotels/${id}`, {
+    // FIXED: Removed hardcoded URL to use API_URL config
+    fetch(`${API_URL}/api/my-hotels/${id}`, {
       headers: { 
         'Authorization': `Bearer ${localStorage.getItem('tara_token')}`,
         'Accept': 'application/json'
@@ -39,7 +43,9 @@ export default function EditHotel() {
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-    await fetch(`https://tara-tourism-system.onrender.com/api/my-hotels/${id}`, {
+    
+    // FIXED: Removed hardcoded URL to use API_URL config
+    await fetch(`${API_URL}/api/my-hotels/${id}`, {
       method: 'PUT',
       headers: { 
         'Content-Type': 'application/json',

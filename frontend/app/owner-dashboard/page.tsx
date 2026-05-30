@@ -4,6 +4,9 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Plus, Hotel, Edit, Trash2 } from 'lucide-react';
 
+// Dynamic API entrypoint setup
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://tara-tourism-system.onrender.com';
+
 export default function OwnerDashboard() {
   const [places, setPlaces] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -11,7 +14,9 @@ export default function OwnerDashboard() {
 
   useEffect(() => {
     // ... keep your existing auth check logic here ...
-    fetch(`https://tara-tourism-system.onrender.com/api/my-hotels`, {
+    
+    // FIXED: Swapped out hardcoded string for your central flexible variable configuration
+    fetch(`${API_URL}/api/my-hotels`, {
       headers: { 
         'Authorization': `Bearer ${localStorage.getItem('tara_token')}`,
         'Accept': 'application/json'

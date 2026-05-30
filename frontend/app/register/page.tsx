@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import { MapPin, Store, Eye, EyeOff, UserPlus } from 'lucide-react';
 import Link from 'next/link';
 
+// Dynamically picks up your backend URL (handles environment variables + provides backup fallback)
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://tara-tourism-system.onrender.com';
+
 export default function RegisterPage() {
   const [role, setRole] = useState<'tourist' | 'owner'>('tourist');
   const [showPassword, setShowPassword] = useState(false);
@@ -18,7 +21,7 @@ export default function RegisterPage() {
     password: '',
     password_confirmation: '',
     restaurant: '',
-    business_type: 'restaurant', // Added business_type state
+    business_type: 'restaurant',
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -30,7 +33,9 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-const response = await fetch('https://tara-tourism-system.onrender.com/api/register', {        method: 'POST',
+      // FIXED: Swapped hardcoded string out for your flexible API_URL variable
+      const response = await fetch(`${API_URL}/api/register`, {        
+        method: 'POST',
         headers: { 
             'Content-Type': 'application/json', 
             'Accept': 'application/json' 
@@ -44,7 +49,6 @@ const response = await fetch('https://tara-tourism-system.onrender.com/api/regis
         localStorage.setItem('tara_token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         
-        // Conditional Redirection Logic
         if (role === 'owner') {
           if (formData.business_type === 'hotel') {
             router.push('/owner-dashboard');

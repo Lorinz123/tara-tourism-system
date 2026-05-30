@@ -6,6 +6,9 @@ import { getLocalUser, LocalUser } from '@/lib/auth';
 import Navbar from '../components/Navbar';
 import { Plus, Pencil, Trash2, X } from 'lucide-react';
 
+// Dynamic API URL entrypoint setup
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://tara-tourism-system.onrender.com';
+
 export default function OwnerDashboard() {
   const router = useRouter();
   const [user, setUser] = useState<LocalUser | null>(null);
@@ -45,33 +48,41 @@ export default function OwnerDashboard() {
 
   const fetchOwnerMenu = async (ownerId: number) => {
     try {
-      const res = await fetch(`https://tara-tourism-system.onrender.com/api/owner-menu/${ownerId}`);
+      // FIXED: Swapped hardcoded string path for custom dynamic API template string
+      const res = await fetch(`${API_URL}/api/owner-menu/${ownerId}`);
       const data = await res.json();
       setMenuItems(data);
-    } catch (err) { console.error(err); } finally { setLoading(false); }
+    } catch (err) { 
+      console.error(err); 
+    } finally { 
+      setLoading(false); 
+    }
   };
 
   const handleSaveProfile = async () => {
-  try {
-    const res = await fetch(`https://tara-tourism-system.onrender.com/api/users/${user?.id}/profile`, {
-      method: 'PUT',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Accept': 'application/json', // <--- THIS STOPS THE REDIRECT
-        'Authorization': `Bearer ${localStorage.getItem('tara_token')}` 
-      },
-      body: JSON.stringify(profileData)
-    });
-    
-    if (!res.ok) {
-       const errorData = await res.json();
-       console.error("Server Error:", errorData);
-       alert("Failed to save: " + (errorData.message || "Unknown error"));
-    } else {
-       alert("Profile updated successfully!");
+    try {
+      // FIXED: Swapped hardcoded string path for custom dynamic API template string
+      const res = await fetch(`${API_URL}/api/users/${user?.id}/profile`, {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('tara_token')}` 
+        },
+        body: JSON.stringify(profileData)
+      });
+      
+      if (!res.ok) {
+         const errorData = await res.json();
+         console.error("Server Error:", errorData);
+         alert("Failed to save: " + (errorData.message || "Unknown error"));
+      } else {
+         alert("Profile updated successfully!");
+      }
+    } catch (err) { 
+      console.error("Network Error:", err); 
     }
-  } catch (err) { console.error("Network Error:", err); }
-};
+  };
 
   const handleSave = async () => {
     const payload = { 
@@ -79,13 +90,18 @@ export default function OwnerDashboard() {
       category: formData.cat, price: formData.price, image_url: formData.image_url, 
       available: formData.available ? 1 : 0 
     };
+
+    // FIXED: Swapped hardcoded string path for custom dynamic API template string
     const url = modalMode === 'add' 
-      ? 'https://tara-tourism-system.onrender.com/api/menu-items' 
-      : `https://tara-tourism-system.onrender.com/api/menu-items/${formData.id}`;
+      ? `${API_URL}/api/menu-items` 
+      : `${API_URL}/api/menu-items/${formData.id}`;
     
     await fetch(url, { 
       method: modalMode === 'add' ? 'POST' : 'PUT', 
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('tara_token')}` }, 
+      headers: { 
+        'Content-Type': 'application/json', 
+        'Authorization': `Bearer ${localStorage.getItem('tara_token')}` 
+      }, 
       body: JSON.stringify(payload) 
     });
     fetchOwnerMenu(Number(user?.id));
@@ -94,7 +110,8 @@ export default function OwnerDashboard() {
 
   const deleteMenuItem = async (id: number) => {
     if (confirm('Are you sure you want to remove this item?')) {
-      await fetch(`https://tara-tourism-system.onrender.com/api/menu-items/${id}`, {
+      // FIXED: Swapped hardcoded string path for custom dynamic API template string
+      await fetch(`${API_URL}/api/menu-items/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('tara_token')}` }
       });

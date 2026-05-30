@@ -13,7 +13,8 @@ import {
   ChevronRight,
 } from 'lucide-react';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+// Added a fallback URL to guarantee connection to your Render backend
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://tara-tourism-system.onrender.com';
 
 const vibes = [
   {
@@ -68,7 +69,8 @@ export default function LandingPage() {
   useEffect(() => {
     const fetchPlaces = async () => {
       try {
-        const response = await fetch(`${API_URL}/places`);
+        // FIXED: Changed /api/places to /api/all-places to match your Laravel routing setup
+        const response = await fetch(`${API_URL}/api/all-places`);
         const data = await response.json();
 
         setAllPlaces(data);
@@ -107,7 +109,7 @@ export default function LandingPage() {
               <Search
                 className="text-white/70 mr-3 flex-shrink-0"
                 size={20}
-              />
+                />
 
               <input
                 type="text"

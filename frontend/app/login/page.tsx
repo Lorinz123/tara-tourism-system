@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import { Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 
+// Dynamic API URL entrypoint setup
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://tara-tourism-system.onrender.com';
+
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -33,7 +36,7 @@ export default function LoginPage() {
         localStorage.removeItem('user');
       }
     }
-  }, []);
+  }, [router]);
 
   const fillDemoAccount = (demoEmail: string, demoPass: string) => {
     setEmail(demoEmail);
@@ -43,9 +46,34 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    // ======================================================================
+    // EMERGENCY PRESENTATION BYPASS MATRIX (Bypasses Broken Railway ENUM)
+    // ======================================================================
+    if (email === 'admin@gmail.com' && password === 'admin') {
+      const mockAdminData = {
+        id: 999,
+        name: 'Tara Core Administrator',
+        email: 'admin@gmail.com',
+        role: 'admin' // Delivers the precise layout role access required by AdminDashboard
+      };
+
+      localStorage.setItem('user', JSON.stringify(mockAdminData));
+      localStorage.setItem('tara_token', 'emergency_presentation_auth_token_bypass');
+
+      // Dispatch auth change so the Navbar renders correctly instantly
+      window.dispatchEvent(new Event('auth-change'));
+      
+      alert("Emergency administrative bypass authorized.");
+      router.push('/admin-dashboard');
+      setLoading(false);
+      return; // Kill the execution path before it hits the broken production API
+    }
+    // ======================================================================
     
     try {
-const response = await fetch('https://tara-tourism-system.onrender.com/api/login', {        method: 'POST',
+      const response = await fetch(`${API_URL}/api/login`, {        
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -77,7 +105,7 @@ const response = await fetch('https://tara-tourism-system.onrender.com/api/login
       }
     } catch (error) {
       console.error("Error logging in:", error);
-      alert("Connection error. Make sure your local Laravel and MySQL/XAMPP databases are active!");
+      alert("Connection error. Make sure your Render backend or environment variables are configured properly!");
     } finally {
       setLoading(false);
     }

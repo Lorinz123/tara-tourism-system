@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
+// Dynamic API URL entrypoint setup
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://tara-tourism-system.onrender.com';
+
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -26,7 +29,8 @@ export default function ForgotPasswordPage() {
     }
     
     try {
-        const response = await fetch('https://tara-tourism-system.onrender.com/api/reset-password', {
+      // FIXED: Swapped out the hardcoded URL with the centralized API_URL config
+      const response = await fetch(`${API_URL}/api/reset-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -50,7 +54,7 @@ export default function ForgotPasswordPage() {
       }
     } catch (error) {
       console.error("Error resetting password:", error);
-      alert("Connection error. Make sure your local Laravel application backend is active!");
+      alert("Connection error. Make sure your Render backend or environment variables are configured properly!");
     } finally {
       setLoading(false);
     }
