@@ -8,62 +8,49 @@ use Illuminate\Support\Facades\Auth;
 
 class PlaceController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | GET ALL PLACES
-    |--------------------------------------------------------------------------
-    */
-    public function allPlaces()
+    // Admin sees all, Owner only sees theirs
+    public function allPlaces(Request $request)
     {
         try {
-            $places = Place::latest()->get();
-            return response()->json($places);
+            $user = $request->user();
+            if ($user && $user->role === 'admin') {
+                return response()->json(Place::latest()->get());
+            }
+            return response()->json(Place::where('owner_id', Auth::id())->latest()->get());
         } catch (\Exception $e) {
             return response()->json(['message' => 'Failed to fetch places', 'error' => $e->getMessage()], 500);
         }
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | GET SINGLE PLACE (Updated to verify ownership if needed)
-    |--------------------------------------------------------------------------
-    */
-    public function show($id)
-{
-    try {
-        // This query will fail (404) if the place doesn't belong to the logged-in user
-        $place = Place::where('id', $id)->where('owner_id', Auth::id())->firstOrFail();
-        return response()->json($place);
-    } catch (\Exception $e) {
-        // If the query fails, it returns 404
-        return response()->json(['message' => 'Place not found or unauthorized'], 404);
-    }
-}
-
-    /*
-    |--------------------------------------------------------------------------
-    | GET OWNER PLACES
-    |--------------------------------------------------------------------------
-    */
-    public function index($ownerId)
+    public function show(Request $request, $id)
     {
         try {
-            $places = Place::where('owner_id', $ownerId)->latest()->get();
-            return response()->json($places);
+            $user = $request->user();
+            $query = Place::where('id', $id);
+
+            // If not admin, restrict to owner_id
+            if ($user->role !== 'admin') {
+                $query->where('owner_id', Auth::id());
+            }
+
+            $place = $query->firstOrFail();
+            return response()->json($place);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to fetch owner places', 'error' => $e->getMessage()], 500);
+            return response()->json(['message' => 'Place not found or unauthorized'], 404);
         }
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | UPDATE PLACE (Consolidated Logic)
-    |--------------------------------------------------------------------------
-    */
     public function update(Request $request, $id)
     {
         try {
-            $place = Place::where('id', $id)->where('owner_id', Auth::id())->firstOrFail();
+            $user = $request->user();
+            $query = Place::where('id', $id);
+
+            if ($user->role !== 'admin') {
+                $query->where('owner_id', Auth::id());
+            }
+
+            $place = $query->firstOrFail();
             
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
@@ -71,81 +58,50 @@ class PlaceController extends Controller
                 'category' => 'required|string|max:255',
                 'image_url' => 'required|string',
                 'address' => 'required|string|max:255',
-                'owner_id' => 'nullable',
             ]);
 
             $place->update($validated);
             return response()->json(['message' => 'Place updated successfully', 'place' => $place]);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to update place', 'error' => $e->getMessage()], 500);
+            return response()->json(['message' => 'Failed to update', 'error' => $e->getMessage()], 500);
         }
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | DELETE PLACE
-    |--------------------------------------------------------------------------
-    */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         try {
-            $place = Place::findOrFail($id);
+            $user = $request->user();
+            $query = Place::where('id', $id);
+
+            // Restrict deletion to admin
+            if ($user->role !== 'admin') {
+                return response()->json(['message' => 'Unauthorized'], 403);
+            }
+
+            $place = $query->firstOrFail();
             $place->delete();
             return response()->json(['message' => 'Place deleted successfully']);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to delete place', 'error' => $e->getMessage()], 500);
+            return response()->json(['message' => 'Failed to delete', 'error' => $e->getMessage()], 500);
         }
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | STORE
-    |--------------------------------------------------------------------------
-    */
-public function store(Request $request)
-{
-    try {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'category' => 'required|string|max:255',
-            'image_url' => 'required|string',
-            'address' => 'required|string|max:255',
-        ]);
-
-        // Dynamically assign the ID of the authenticated user
-        $validated['owner_id'] = Auth::id();
-
-        $place = Place::create($validated);
-        return response()->json(['message' => 'Place created successfully', 'place' => $place], 201);
-    } catch (\Exception $e) {
-        return response()->json(['message' => 'Failed to create place', 'error' => $e->getMessage()], 500);
-    }
-}
-
-    /*
-    |--------------------------------------------------------------------------
-    | MY HOTELS / MY PLACES (Consolidated)
-    |--------------------------------------------------------------------------
-    */
-    public function myHotels(Request $request)
+    public function store(Request $request)
     {
         try {
-            \Log::info("Current User ID: " . Auth::id());
-            // This replaces your previous 'myPlaces' and 'myHotels' methods
-            $places = Place::where('owner_id', Auth::id())->get();
-            return response()->json($places);
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'description' => 'required|string',
+                'category' => 'required|string|max:255',
+                'image_url' => 'required|string',
+                'address' => 'required|string|max:255',
+            ]);
+
+            $validated['owner_id'] = Auth::id();
+            $place = Place::create($validated);
+            return response()->json(['message' => 'Place created successfully', 'place' => $place], 201);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to fetch hotels', 'error' => $e->getMessage()], 500);
+            return response()->json(['message' => 'Failed to create place', 'error' => $e->getMessage()], 500);
         }
     }
-
-    public function showPublic($id)
-{
-    $place = Place::find($id);
-    if (!$place) {
-        return response()->json(['message' => 'Not found'], 404);
-    }
-    return response()->json($place);
-}
 }
