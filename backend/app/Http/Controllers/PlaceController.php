@@ -86,22 +86,26 @@ class PlaceController extends Controller
         }
     }
 
-    public function store(Request $request)
-    {
-        try {
-            $validated = $request->validate([
-                'name' => 'required|string|max:255',
-                'description' => 'required|string',
-                'category' => 'required|string|max:255',
-                'image_url' => 'required|string',
-                'address' => 'required|string|max:255',
-            ]);
+public function store(Request $request)
+{
+    try {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'category' => 'required|string|max:255',
+            'image_url' => 'required|string',
+            'address' => 'required|string|max:255',
+        ]);
 
-            $validated['owner_id'] = Auth::id();
-            $place = Place::create($validated);
-            return response()->json(['message' => 'Place created successfully', 'place' => $place], 201);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to create place', 'error' => $e->getMessage()], 500);
-        }
+        // Fix: Assign the ID from the current session
+        $validated['owner_id'] = Auth::id(); 
+
+        $place = Place::create($validated);
+        return response()->json(['message' => 'Place created successfully', 'place' => $place], 201);
+    } catch (\Exception $e) {
+        // This log will show up in your Render Logs!
+        \Log::error("Store Error: " . $e->getMessage()); 
+        return response()->json(['message' => 'Failed to create place', 'error' => $e->getMessage()], 500);
     }
+}
 }
